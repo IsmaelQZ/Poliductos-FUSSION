@@ -1,0 +1,44 @@
+:root{
+  --navy:#16232F; --navy-soft:#22333F; --amber:#E8963C; --paper:#F6F4EF;
+  --ink:#16232F; --muted:#6B7686; --line:#D8D2C4; --ok:#3C8562; --warn:#B4552F;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--paper); color:var(--ink); }
+.app{ display:flex; flex-direction:column; height:100vh; height:100dvh; }
+
+.topbar{ background:var(--navy); color:#fff; padding:14px 16px 10px; flex-shrink:0; }
+.topbar-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.brand{ font-weight:700; font-size:15px; }
+.brand small{ display:block; font-weight:400; color:#9FB0C0; font-size:11px; margin-top:1px; }
+
+select#routeSelect{ background:var(--navy-soft); color:#fff; border:1px solid #3A4D5E; border-radius:8px; padding:8px 10px; font-size:13px; font-weight:600; max-width:56%; }
+select#routeSelect option:disabled{ color:#7A8896; }
+
+.status-banner{ margin-top:10px; font-size:11.5px; padding:7px 10px; border-radius:7px; display:flex; gap:7px; align-items:center; }
+.status-banner.ok{ background:#2A3B2F; border:1px solid #3C5744; color:#BEDFC9; }
+.status-banner.loading{ background:#2A333B; border:1px solid #3C4A57; color:#B9CBDD; }
+.status-banner.warn{ background:#3B2B22; border:1px solid #5A4030; color:#F0C7AE; }
+.dot{ width:7px; height:7px; border-radius:50%; background:var(--ok); flex-shrink:0; }
+
+#map{ flex:1; min-height:0; }
+
+.panel{ background:#fff; border-top:1px solid var(--line); max-height:38%; overflow-y:auto; flex-shrink:0; }
+.panel-head{ padding:10px 16px 6px; font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; position:sticky; top:0; background:#fff; }
+
+.stop{ display:flex; align-items:center; gap:12px; padding:9px 16px; border-top:1px solid #F0EDE5; cursor:pointer; }
+.stop:active{ background:#F6F4EF; }
+.badge{ width:26px; height:26px; border-radius:50%; background:var(--amber); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; }
+.stop-info{ flex:1; min-width:0; }
+.stop-name{ font-weight:600; font-size:13.5px; }
+.stop-addr{ font-size:11.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nav-btn{ flex-shrink:0; background:var(--navy); color:#fff; border:none; border-radius:7px; padding:8px 10px; font-size:11px; font-weight:600; }
+
+.actions-row{ margin-top:8px; gap:8px; }
+.sync-btn, .download-btn{ flex:1; background:var(--amber); color:#fff; border:none; border-radius:7px; padding:8px 10px; font-size:12px; font-weight:600; }
+.sync-btn{ background:var(--navy-soft); border:1px solid #3A4D5E; }
+.sync-btn:disabled, .download-btn:disabled{ opacity:.6; }
+.sync-status{ margin-top:6px; font-size:10.5px; color:#9FB0C0; }
+
+.marker-num{ background:var(--amber); color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.35); }
+
+.empty-state{ padding:24px 16px; text-align:center; color:var(--muted); font-size:13px; }

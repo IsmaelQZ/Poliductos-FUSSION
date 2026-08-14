@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Rutas Comerciales</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#16232F">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+<script src="vendor/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="brand">Ruta del día<small>Datos reales — 2 rutas comerciales</small></div>
+      <select id="routeSelect"></select>
+    </div>
+    <div class="topbar-row actions-row">
+      <button id="syncBtn" class="sync-btn">🔄 Actualizar datos</button>
+      <button id="downloadBtn" class="download-btn">⬇ Descargar ruta sin conexión</button>
+    </div>
+    <div class="sync-status" id="syncStatus">Datos actualizados: —</div>
+    <div class="status-banner loading" id="statusBanner"><span class="dot"></span> Calculando ruta por calles…</div>
+  </div>
+  <div id="map"></div>
+  <div class="panel">
+    <div class="panel-head" id="panelHead">Orden de visita</div>
+    <div id="stopsList"></div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

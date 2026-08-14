@@ -1,0 +1,15 @@
+{
+  "name": "Rutas Comerciales",
+  "short_name": "Rutas",
+  "description": "Orden de visita a clientes por ruta, con mapa y trazo real por calles.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F4EF",
+  "theme_color": "#16232F",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
