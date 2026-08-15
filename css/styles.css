@@ -42,3 +42,11 @@ select#routeSelect option:disabled{ color:#7A8896; }
 .marker-num{ background:var(--amber); color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.35); }
 
 .empty-state{ padding:24px 16px; text-align:center; color:var(--muted); font-size:13px; }
+
+.locate-btn{
+  width:40px; height:40px; background:#fff; border:2px solid rgba(0,0,0,.2); border-radius:8px;
+  font-size:18px; line-height:1; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.locate-btn:active{ background:#F6F4EF; }
+.locate-btn-pending{ animation:locate-pulse 1s ease-in-out infinite; }
+@keyframes locate-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }

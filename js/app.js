@@ -1,5 +1,5 @@
 import { loadRoutes, syncRoutes, getLastSync, PENDING_ROUTES } from './data.js';
-import { renderMarkersAndList, drawRealRoute } from './map.js';
+import { renderMarkersAndList, drawRealRoute, enableLiveLocation } from './map.js';
 import { downloadRouteForOffline } from './offline.js';
 
 function populateSelect(select, routes) {
@@ -93,6 +93,7 @@ async function main() {
   });
 
   loadRoute(Object.keys(routes)[0]);
+  enableLiveLocation();
 }
 
 main();

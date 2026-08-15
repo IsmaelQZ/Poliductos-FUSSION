@@ -9,6 +9,72 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const markersLayer = L.layerGroup().addTo(map);
 let routeLine = null;
 
+// Ubicación en vivo del vendedor. Usa el GPS del dispositivo (navigator.geolocation),
+// que no depende de internet, así que también funciona en modo offline.
+let userMarker = null;
+let userAccuracyCircle = null;
+
+function ensureUserLayers() {
+  if (!userMarker) {
+    userAccuracyCircle = L.circle([0, 0], {
+      radius: 0, color: '#3B82F6', weight: 1, fillColor: '#3B82F6', fillOpacity: 0.12,
+    });
+    userMarker = L.circleMarker([0, 0], {
+      radius: 8, color: '#fff', weight: 3, fillColor: '#3B82F6', fillOpacity: 1,
+    });
+  }
+}
+
+export function enableLiveLocation() {
+  const locateBtn = L.control({ position: 'bottomright' });
+  locateBtn.onAdd = () => {
+    const el = L.DomUtil.create('button', 'locate-btn');
+    el.type = 'button';
+    el.title = 'Centrar en mi ubicación';
+    el.textContent = '📍';
+    L.DomEvent.disableClickPropagation(el);
+    el.addEventListener('click', () => {
+      if (userMarker) {
+        map.setView(userMarker.getLatLng(), Math.max(map.getZoom(), 15));
+        return;
+      }
+      el.classList.add('locate-btn-pending');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          ensureUserLayers();
+          userAccuracyCircle.setLatLng([latitude, longitude]).setRadius(accuracy).addTo(map);
+          userMarker.setLatLng([latitude, longitude]).addTo(map);
+          map.setView([latitude, longitude], 15);
+          el.classList.remove('locate-btn-pending');
+        },
+        err => {
+          console.warn('No se pudo obtener la ubicación:', err.message);
+          el.classList.remove('locate-btn-pending');
+        },
+        { enableHighAccuracy: true, timeout: 20000 }
+      );
+    });
+    return el;
+  };
+  locateBtn.addTo(map);
+
+  if (!('geolocation' in navigator)) return;
+
+  navigator.geolocation.watchPosition(
+    pos => {
+      const { latitude, longitude, accuracy } = pos.coords;
+      ensureUserLayers();
+      userAccuracyCircle.setLatLng([latitude, longitude]).setRadius(accuracy).addTo(map);
+      userMarker.setLatLng([latitude, longitude]).addTo(map);
+    },
+    err => {
+      console.warn('No se pudo obtener la ubicación:', err.message);
+    },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+  );
+}
+
 function numIcon(n) {
   return L.divIcon({ className: '', html: `<div class="marker-num">${n}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
 }
