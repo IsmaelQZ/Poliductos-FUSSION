@@ -14,7 +14,7 @@ const COORD_PAIR_RE = /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/;
 
 // Lectura de columnas insensible a mayúsculas/minúsculas: cada quien
 // termina escribiendo los encabezados un poco distinto entre hojas.
-function field(row, name) {
+export function field(row, name) {
   const key = Object.keys(row).find(k => k.toLowerCase() === name.toLowerCase());
   return key ? row[key] : '';
 }

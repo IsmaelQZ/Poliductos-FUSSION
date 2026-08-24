@@ -1,5 +1,6 @@
 import { loadRoutes, syncRoutes, getLastSync, PENDING_ROUTES } from './data.js';
-import { renderMarkersAndList, drawRealRoute, enableLiveLocation } from './map.js';
+import { loadPricing, syncPricing } from './pricing.js';
+import { renderMarkersAndList, drawRealRoute, enableLiveLocation, addClientsButton } from './map.js';
 import { downloadRouteForOffline } from './offline.js';
 
 function populateSelect(select, routes) {
@@ -27,13 +28,48 @@ function fmtSyncTime(ts) {
   return d.toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
+function openSheet(el) { el.classList.add('open'); }
+function closeSheet(el) { el.classList.remove('open'); }
+
+function setupSheet(el) {
+  el.querySelectorAll('[data-close]').forEach(trigger => {
+    trigger.addEventListener('click', () => closeSheet(el));
+  });
+}
+
+function renderClientInfo(client, pricing) {
+  document.getElementById('infoName').textContent = client.nombre;
+
+  const phoneEl = document.getElementById('infoPhone');
+  phoneEl.innerHTML = client.telefono
+    ? `<a href="tel:${client.telefono}">📞 ${client.telefono}</a>`
+    : '<span class="no-phone">Sin teléfono registrado</span>';
+
+  const pricingEl = document.getElementById('infoPricing');
+  const items = pricing[client.id];
+  if (!items || items.length === 0) {
+    pricingEl.innerHTML = '<div class="empty-state">Aún no hay lista de precios configurada para este cliente.</div>';
+    return;
+  }
+  const rows = items.map(p => `<tr><td>${p.producto}</td><td>${p.precio}</td></tr>`).join('');
+  pricingEl.innerHTML = `
+    <table class="price-table">
+      <thead><tr><th>Producto</th><th>Precio</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
 async function main() {
   const select = document.getElementById('routeSelect');
   const downloadBtn = document.getElementById('downloadBtn');
   const syncBtn = document.getElementById('syncBtn');
   const syncStatus = document.getElementById('syncStatus');
+  const clientsSheet = document.getElementById('clientsSheet');
+  const infoSheet = document.getElementById('infoSheet');
+  setupSheet(clientsSheet);
+  setupSheet(infoSheet);
 
-  let routes = await loadRoutes();
+  let [routes, pricing] = await Promise.all([loadRoutes(), loadPricing()]);
   populateSelect(select, routes);
   syncStatus.textContent = `Datos actualizados: ${fmtSyncTime(await getLastSync())}`;
 
@@ -42,7 +78,13 @@ async function main() {
   function loadRoute(routeName) {
     currentRouteName = routeName;
     const clients = routes[routeName];
-    renderMarkersAndList(routeName, clients);
+    renderMarkersAndList(routeName, clients, {
+      onLocate: () => closeSheet(clientsSheet),
+      onInfo: client => {
+        renderClientInfo(client, pricing);
+        openSheet(infoSheet);
+      },
+    });
     drawRealRoute(routeName, clients);
   }
 
@@ -56,7 +98,7 @@ async function main() {
     const originalLabel = syncBtn.textContent;
     syncBtn.textContent = 'Actualizando…';
     try {
-      routes = await syncRoutes();
+      [routes, pricing] = await Promise.all([syncRoutes(), syncPricing()]);
       populateSelect(select, routes);
       syncStatus.textContent = `Datos actualizados: ${fmtSyncTime(await getLastSync())}`;
       if (!routes[currentRouteName]) currentRouteName = null;
@@ -94,6 +136,7 @@ async function main() {
 
   loadRoute(Object.keys(routes)[0]);
   enableLiveLocation();
+  addClientsButton(() => openSheet(clientsSheet));
 }
 
 main();

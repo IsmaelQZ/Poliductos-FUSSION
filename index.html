@@ -30,9 +30,30 @@
     <div class="status-banner loading" id="statusBanner"><span class="dot"></span> Calculando ruta por calles…</div>
   </div>
   <div id="map"></div>
-  <div class="panel">
-    <div class="panel-head" id="panelHead">Orden de visita</div>
+</div>
+
+<div class="sheet" id="clientsSheet">
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="panelHead">Orden de visita</div>
+      <button class="sheet-close" data-close>✕</button>
+    </div>
     <div id="stopsList"></div>
+  </div>
+</div>
+
+<div class="sheet" id="infoSheet">
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="infoName">Cliente</div>
+      <button class="sheet-close" data-close>✕</button>
+    </div>
+    <div id="infoPhone" class="info-phone"></div>
+    <div id="infoPricing" class="info-pricing"></div>
   </div>
 </div>
 

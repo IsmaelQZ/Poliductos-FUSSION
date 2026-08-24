@@ -75,6 +75,29 @@ export function enableLiveLocation() {
   );
 }
 
+const CONTACTS_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="9" cy="8" r="3.3"/>
+  <path d="M2.5 19c0-3.3 2.9-5.7 6.5-5.7s6.5 2.4 6.5 5.7v.6H2.5V19z"/>
+  <circle cx="17" cy="7.5" r="2.6" opacity=".55"/>
+  <path d="M14.8 12.6c.9-.5 2-.8 3.2-.8 3.1 0 5.5 2 5.5 4.7v.5h-7.2c0-1.7-.6-3.2-1.5-4.4z" opacity=".55"/>
+</svg>`;
+
+// Botón flotante para abrir la lista de clientes de la ruta (junto al de
+// ubicación). onOpen la controla app.js — este módulo solo dibuja el botón.
+export function addClientsButton(onOpen) {
+  const btn = L.control({ position: 'bottomright' });
+  btn.onAdd = () => {
+    const el = L.DomUtil.create('button', 'clients-btn');
+    el.type = 'button';
+    el.title = 'Ver clientes de la ruta';
+    el.innerHTML = CONTACTS_ICON;
+    L.DomEvent.disableClickPropagation(el);
+    el.addEventListener('click', onOpen);
+    return el;
+  };
+  btn.addTo(map);
+}
+
 function numIcon(n) {
   return L.divIcon({ className: '', html: `<div class="marker-num">${n}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
 }
@@ -83,7 +106,10 @@ function fmtCoord(c) {
   return `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
 }
 
-export function renderMarkersAndList(routeName, clients) {
+// onLocate(client) y onInfo(client) son callbacks de app.js: onLocate se
+// dispara al tocar el nombre de un cliente (después de centrar el mapa
+// aquí mismo), onInfo al tocar "Info" (la ficha la arma app.js).
+export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = {}) {
   markersLayer.clearLayers();
   const listEl = document.getElementById('stopsList');
   document.getElementById('panelHead').textContent = `Orden de visita — ${routeName} (${clients.length} clientes)`;
@@ -106,15 +132,25 @@ export function renderMarkersAndList(routeName, clients) {
         <div class="stop-name">${s.nombre}</div>
         <div class="stop-addr">${fmtCoord(s)}</div>
       </div>
-      <button class="nav-btn" data-lat="${s.lat}" data-lng="${s.lng}">Ir →</button>`;
-    listEl.appendChild(row);
-  });
+      <div class="stop-actions">
+        <button class="info-btn">Info</button>
+        <button class="nav-btn" data-lat="${s.lat}" data-lng="${s.lng}">Ir →</button>
+      </div>`;
 
-  listEl.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${btn.dataset.lat},${btn.dataset.lng}`, '_blank');
+    row.addEventListener('click', () => {
+      map.setView([s.lat, s.lng], 17);
+      onLocate?.(s);
     });
+    row.querySelector('.info-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      onInfo?.(s);
+    });
+    row.querySelector('.nav-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`, '_blank');
+    });
+
+    listEl.appendChild(row);
   });
 }
 
