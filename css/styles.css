@@ -3,8 +3,13 @@
   --ink:#16232F; --muted:#6B7686; --line:#D8D2C4; --ok:#3C8562; --warn:#B4552F;
 }
 *{ box-sizing:border-box; }
-body{ margin:0; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--paper); color:var(--ink); }
-.app{ display:flex; flex-direction:column; height:100vh; height:100dvh; }
+html, body{ height:100%; margin:0; }
+body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--paper); color:var(--ink); }
+/* position:fixed + inset:0 en vez de 100vh/100dvh: en iOS standalone con
+   viewport-fit=cover, dvh a veces no cubre el viewport visual completo y
+   deja una tira del fondo de body visible abajo. Fijar a los bordes del
+   viewport evita ese hueco sin depender de las unidades de viewport. */
+.app{ position:fixed; inset:0; display:flex; flex-direction:column; }
 
 .topbar{
   background:var(--navy); color:#fff; flex-shrink:0;
