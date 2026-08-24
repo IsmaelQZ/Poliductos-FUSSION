@@ -182,7 +182,7 @@ export async function drawRealRoute(routeName, clients) {
   try {
     const geo = await getRouteGeometry(routeName, clients);
     const coords = geo.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    routeLine = L.polyline(coords, { color: '#4A90E2', weight: 4, opacity: 0.9 }).addTo(map);
+    routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9 }).addTo(map);
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
     const km = (geo.distance / 1000).toFixed(1);
