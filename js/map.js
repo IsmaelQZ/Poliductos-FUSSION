@@ -9,6 +9,17 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const markersLayer = L.layerGroup().addTo(map);
 let routeLine = null;
 
+// Leaflet mide el contenedor una sola vez al iniciar. En una PWA instalada
+// en iOS el layout final (zonas seguras, barra de estado) a veces no está
+// asentado todavía en ese momento, y el mapa se queda con un tamaño viejo
+// aunque el contenedor sí mida bien — hay que forzar que se recalcule.
+function refreshMapSize() { map.invalidateSize(); }
+window.addEventListener('load', refreshMapSize);
+window.addEventListener('resize', refreshMapSize);
+window.addEventListener('orientationchange', () => setTimeout(refreshMapSize, 250));
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshMapSize(); });
+setTimeout(refreshMapSize, 300);
+
 // Ubicación en vivo del vendedor. Usa el GPS del dispositivo (navigator.geolocation),
 // que no depende de internet, así que también funciona en modo offline.
 let userMarker = null;
@@ -171,7 +182,7 @@ export async function drawRealRoute(routeName, clients) {
   try {
     const geo = await getRouteGeometry(routeName, clients);
     const coords = geo.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9 }).addTo(map);
+    routeLine = L.polyline(coords, { color: '#4A90E2', weight: 4, opacity: 0.9 }).addTo(map);
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
     const km = (geo.distance / 1000).toFixed(1);
