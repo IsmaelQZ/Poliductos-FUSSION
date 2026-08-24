@@ -156,7 +156,7 @@ export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = 
 
 function drawStraightFallback(clients) {
   const latlngs = clients.map(c => [c.lat, c.lng]);
-  routeLine = L.polyline(latlngs, { color: '#B4552F', weight: 3, dashArray: '6,6', opacity: 0.85 }).addTo(map);
+  routeLine = L.polyline(latlngs, { color: '#C23B2A', weight: 3, dashArray: '6,6', opacity: 0.85 }).addTo(map);
   map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 }
 
@@ -171,7 +171,7 @@ export async function drawRealRoute(routeName, clients) {
   try {
     const geo = await getRouteGeometry(routeName, clients);
     const coords = geo.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    routeLine = L.polyline(coords, { color: '#E8963C', weight: 4, opacity: 0.9 }).addTo(map);
+    routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9 }).addTo(map);
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
     const km = (geo.distance / 1000).toFixed(1);

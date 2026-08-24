@@ -1,6 +1,7 @@
+/* Paleta tomada del logo de la empresa (azul marino → naranja). */
 :root{
-  --navy:#16232F; --navy-soft:#22333F; --amber:#E8963C; --paper:#F6F4EF;
-  --ink:#16232F; --muted:#6B7686; --line:#D8D2C4; --ok:#3C8562; --warn:#B4552F;
+  --navy:#0C0943; --navy-soft:#2A3D8F; --amber:#F4700D; --paper:#F6F4EF;
+  --ink:#0C0943; --muted:#62709A; --line:#D8DEEA; --ok:#3C8562; --warn:#C23B2A;
 }
 *{ box-sizing:border-box; }
 html, body{ height:100%; margin:0; }
