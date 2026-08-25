@@ -1,5 +1,5 @@
 import { loadRoutes, syncRoutes, getLastSync, PENDING_ROUTES } from './data.js';
-import { loadPricing, syncPricing } from './pricing.js';
+import { loadPricing, syncPricing, normalizeClientName } from './pricing.js';
 import { renderMarkersAndList, drawRealRoute, enableLiveLocation, addClientsButton } from './map.js';
 import { downloadRouteForOffline } from './offline.js';
 
@@ -46,7 +46,7 @@ function renderClientInfo(client, pricing) {
     : '<span class="no-phone">Sin teléfono registrado</span>';
 
   const pricingEl = document.getElementById('infoPricing');
-  const items = pricing[client.id];
+  const items = pricing[normalizeClientName(client.nombre)];
   if (!items || items.length === 0) {
     pricingEl.innerHTML = '<div class="empty-state">Aún no hay lista de precios configurada para este cliente.</div>';
     return;
