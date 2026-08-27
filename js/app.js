@@ -29,11 +29,53 @@ function fmtSyncTime(ts) {
 }
 
 function openSheet(el) { el.classList.add('open'); }
-function closeSheet(el) { el.classList.remove('open'); }
+function closeSheet(el) {
+  el.classList.remove('open');
+  // Si la hoja tiene buscador, que empiece limpio la próxima vez que se abra.
+  const search = el.querySelector('.client-search');
+  if (search && search.value) {
+    search.value = '';
+    search.dispatchEvent(new Event('input'));
+  }
+}
 
 function setupSheet(el) {
   el.querySelectorAll('[data-close]').forEach(trigger => {
     trigger.addEventListener('click', () => closeSheet(el));
+  });
+}
+
+function normalizeSearchText(s) {
+  // Quita acentos (NFD separa la letra de su diacrítico, luego se descarta
+  // el diacrítico) para que buscar "ferreteria" encuentre "Ferretería".
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function setupClientSearch() {
+  const input = document.getElementById('clientSearch');
+  const list = document.getElementById('stopsList');
+  input.addEventListener('input', () => {
+    const q = normalizeSearchText(input.value.trim());
+    const rows = list.querySelectorAll('.stop');
+    let anyVisible = false;
+    rows.forEach(row => {
+      const name = row.querySelector('.stop-name')?.textContent || '';
+      const match = !q || normalizeSearchText(name).includes(q);
+      row.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+
+    let noResults = list.querySelector('.no-results');
+    if (rows.length > 0 && !anyVisible) {
+      if (!noResults) {
+        noResults = document.createElement('div');
+        noResults.className = 'empty-state no-results';
+        noResults.textContent = 'No se encontró ningún cliente con ese nombre.';
+        list.appendChild(noResults);
+      }
+    } else if (noResults) {
+      noResults.remove();
+    }
   });
 }
 
@@ -68,6 +110,7 @@ async function main() {
   const infoSheet = document.getElementById('infoSheet');
   setupSheet(clientsSheet);
   setupSheet(infoSheet);
+  setupClientSearch();
 
   let [routes, pricing] = await Promise.all([loadRoutes(), loadPricing()]);
   populateSelect(select, routes);

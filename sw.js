@@ -3,7 +3,7 @@
 // del mapa (OpenStreetMap) a medida que se piden — ya sea navegando el mapa
 // o por la descarga proactiva de js/offline.js. La geometría de ruta real
 // (OSRM) se cachea aparte, en IndexedDB, ver js/routing.js.
-const SHELL_CACHE = 'rutas-shell-v18';
+const SHELL_CACHE = 'rutas-shell-v19';
 const TILE_CACHE = 'rutas-tiles-v1';
 const MAX_TILE_ENTRIES = 8000; // cubre ambas rutas (z11–15) con margen
 const APP_SHELL = [
