@@ -22,16 +22,26 @@ setTimeout(refreshMapSize, 300);
 
 // Ubicación en vivo del vendedor. Usa el GPS del dispositivo (navigator.geolocation),
 // que no depende de internet, así que también funciona en modo offline.
+//
+// Pane propio con z-index entre el trazo de ruta (overlayPane, 400) y los
+// marcadores de clientes (markerPane, 600): así el punto de ubicación
+// siempre queda por encima del trazo pero nunca tapa a un cliente, sin
+// importar en qué orden se hayan dibujado (el trazo se vuelve a dibujar
+// en cada sincronización, lo que antes lo dejaba encima al compartir pane
+// con el punto de ubicación).
+const userLocationPane = map.createPane('userLocationPane');
+userLocationPane.style.zIndex = 450;
+
 let userMarker = null;
 let userAccuracyCircle = null;
 
 function ensureUserLayers() {
   if (!userMarker) {
     userAccuracyCircle = L.circle([0, 0], {
-      radius: 0, color: '#3B82F6', weight: 1, fillColor: '#3B82F6', fillOpacity: 0.12,
+      radius: 0, color: '#3B82F6', weight: 1, fillColor: '#3B82F6', fillOpacity: 0.12, pane: 'userLocationPane',
     });
     userMarker = L.circleMarker([0, 0], {
-      radius: 8, color: '#fff', weight: 3, fillColor: '#3B82F6', fillOpacity: 1,
+      radius: 8, color: '#fff', weight: 3, fillColor: '#3B82F6', fillOpacity: 1, pane: 'userLocationPane',
     });
   }
 }
