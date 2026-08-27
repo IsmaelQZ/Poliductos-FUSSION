@@ -117,6 +117,10 @@ function fmtCoord(c) {
   return `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
 }
 
+function googleMapsUrl(lat, lng) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+}
+
 // onLocate(client) y onInfo(client) son callbacks de app.js: onLocate se
 // dispara al tocar el nombre de un cliente (después de centrar el mapa
 // aquí mismo), onInfo al tocar "Info" (la ficha la arma app.js).
@@ -134,7 +138,7 @@ export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = 
   clients.forEach((s, i) => {
     const n = i + 1;
     L.marker([s.lat, s.lng], { icon: numIcon(n) }).addTo(markersLayer)
-      .bindPopup(`<b>${n}. ${s.nombre}</b><br>${fmtCoord(s)}`);
+      .bindPopup(`<b>${n}. ${s.nombre}</b><br><a class="popup-nav-link" href="${googleMapsUrl(s.lat, s.lng)}" target="_blank" rel="noopener">Ir →</a>`);
     const row = document.createElement('div');
     row.className = 'stop';
     row.innerHTML = `
@@ -158,7 +162,7 @@ export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = 
     });
     row.querySelector('.nav-btn').addEventListener('click', e => {
       e.stopPropagation();
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`, '_blank');
+      window.open(googleMapsUrl(s.lat, s.lng), '_blank');
     });
 
     listEl.appendChild(row);
