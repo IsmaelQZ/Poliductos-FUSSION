@@ -185,7 +185,7 @@ function drawStraightFallback(clients) {
   map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 }
 
-export async function drawRealRoute(routeName, clients) {
+export async function drawRealRoute(routeName, clients, { force = false } = {}) {
   const banner = document.getElementById('statusBanner');
   if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
   if (clients.length < 2) return;
@@ -194,7 +194,7 @@ export async function drawRealRoute(routeName, clients) {
   banner.innerHTML = '<span class="dot"></span> Calculando ruta por calles…';
 
   try {
-    const geo = await getRouteGeometry(routeName, clients);
+    const geo = await getRouteGeometry(routeName, clients, { force });
     const coords = geo.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9 }).addTo(map);
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });

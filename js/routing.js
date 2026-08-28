@@ -13,11 +13,15 @@ function geometryKey(routeName, clients) {
   return `geometry:${routeName}:${fingerprint}`;
 }
 
-// clients: [{lat, lng}, ...] en el orden de visita
-export async function getRouteGeometry(routeName, clients) {
+// clients: [{lat, lng}, ...] en el orden de visita. force:true se salta la
+// caché aunque la huella coincida (se usa al tocar "Actualizar datos", para
+// no depender solo de que la huella detecte el cambio correctamente).
+export async function getRouteGeometry(routeName, clients, { force = false } = {}) {
   const key = geometryKey(routeName, clients);
-  const cached = await idbGet(key);
-  if (cached) return cached;
+  if (!force) {
+    const cached = await idbGet(key);
+    if (cached) return cached;
+  }
 
   const coordStr = clients.map(c => `${c.lng},${c.lat}`).join(';');
   const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;

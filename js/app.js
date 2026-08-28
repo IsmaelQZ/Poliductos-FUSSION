@@ -118,7 +118,7 @@ async function main() {
 
   let currentRouteName = null;
 
-  function loadRoute(routeName) {
+  function loadRoute(routeName, { force = false } = {}) {
     currentRouteName = routeName;
     const clients = routes[routeName];
     renderMarkersAndList(routeName, clients, {
@@ -128,7 +128,7 @@ async function main() {
         openSheet(infoSheet);
       },
     });
-    drawRealRoute(routeName, clients);
+    drawRealRoute(routeName, clients, { force });
   }
 
   select.addEventListener('change', () => {
@@ -145,7 +145,7 @@ async function main() {
       populateSelect(select, routes);
       syncStatus.textContent = `Datos actualizados: ${fmtSyncTime(await getLastSync())}`;
       if (!routes[currentRouteName]) currentRouteName = null;
-      loadRoute(currentRouteName || Object.keys(routes)[0]);
+      loadRoute(currentRouteName || Object.keys(routes)[0], { force: true });
       syncBtn.textContent = '✓ Datos al día';
     } catch (err) {
       syncBtn.textContent = 'No se pudo actualizar';
