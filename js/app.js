@@ -28,6 +28,27 @@ function fmtSyncTime(ts) {
   return d.toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
+// Aviso corto tipo "toast": confirma acciones sin cambiar el texto de los botones de la tarjeta.
+// sticky:true lo deja visible (p. ej. progreso de descarga) hasta el siguiente aviso.
+let toastTimer = null;
+function showToast(message, { sticky = false } = {}) {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  if (!sticky) toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// Los controles de Leaflet de arriba (zoom, brújula) deben quedar debajo de la tarjeta flotante;
+// su altura cambia (el chip de estado puede ocupar una o dos líneas), así que se mide.
+function trackHudHeight() {
+  const hud = document.querySelector('.hud');
+  const apply = () => document.documentElement.style.setProperty('--hud-h', Math.ceil(hud.getBoundingClientRect().height) + 'px');
+  apply();
+  if ('ResizeObserver' in window) new ResizeObserver(apply).observe(hud);
+  else window.addEventListener('resize', apply);
+}
+
 function openSheet(el) { el.classList.add('open'); }
 function closeSheet(el) {
   el.classList.remove('open', 'searching');
@@ -130,10 +151,11 @@ async function main() {
   setupSheet(clientsSheet);
   setupSheet(infoSheet);
   setupClientSearch();
+  trackHudHeight();
 
   let [routes, pricing] = await Promise.all([loadRoutes(), loadPricing()]);
   populateSelect(select, routes);
-  syncStatus.textContent = `Datos actualizados: ${fmtSyncTime(await getLastSync())}`;
+  syncStatus.textContent = `Actualizado: ${fmtSyncTime(await getLastSync())}`;
 
   let currentRouteName = null;
 
@@ -157,42 +179,38 @@ async function main() {
 
   syncBtn.addEventListener('click', async () => {
     syncBtn.disabled = true;
-    const originalLabel = syncBtn.textContent;
-    syncBtn.textContent = 'Actualizando…';
+    syncBtn.classList.add('busy');
+    showToast('Actualizando datos…', { sticky: true });
     try {
       [routes, pricing] = await Promise.all([syncRoutes(), syncPricing()]);
       populateSelect(select, routes);
-      syncStatus.textContent = `Datos actualizados: ${fmtSyncTime(await getLastSync())}`;
+      syncStatus.textContent = `Actualizado: ${fmtSyncTime(await getLastSync())}`;
       if (!routes[currentRouteName]) currentRouteName = null;
       loadRoute(currentRouteName || Object.keys(routes)[0], { force: true });
-      syncBtn.textContent = '✓ Datos al día';
+      showToast('✓ Datos al día');
     } catch (err) {
-      syncBtn.textContent = 'No se pudo actualizar';
+      showToast('No se pudo actualizar. Revisa tu conexión.');
     } finally {
-      setTimeout(() => {
-        syncBtn.textContent = originalLabel;
-        syncBtn.disabled = false;
-      }, 3000);
+      syncBtn.disabled = false;
+      syncBtn.classList.remove('busy');
     }
   });
 
   downloadBtn.addEventListener('click', async () => {
     if (!currentRouteName) return;
     downloadBtn.disabled = true;
-    const originalLabel = downloadBtn.textContent;
-    downloadBtn.textContent = 'Descargando mapa… 0%';
+    downloadBtn.classList.add('busy');
+    showToast('Descargando mapa… 0%', { sticky: true });
     try {
       await downloadRouteForOffline(currentRouteName, routes[currentRouteName], (done, total) => {
-        downloadBtn.textContent = `Descargando mapa… ${Math.round((done / total) * 100)}%`;
+        showToast(`Descargando mapa… ${Math.round((done / total) * 100)}%`, { sticky: true });
       });
-      downloadBtn.textContent = '✓ Lista para uso sin conexión';
+      showToast('✓ Ruta lista para usar sin conexión');
     } catch (err) {
-      downloadBtn.textContent = 'No se pudo descargar, reintenta con internet';
+      showToast('No se pudo descargar. Reintenta con internet.');
     } finally {
-      setTimeout(() => {
-        downloadBtn.textContent = originalLabel;
-        downloadBtn.disabled = false;
-      }, 3000);
+      downloadBtn.disabled = false;
+      downloadBtn.classList.remove('busy');
     }
   });
 

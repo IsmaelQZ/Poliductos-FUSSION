@@ -175,7 +175,7 @@ function googleMapsUrl(lat, lng) {
 export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = {}) {
   markersLayer.clearLayers();
   const listEl = document.getElementById('stopsList');
-  document.getElementById('panelHead').textContent = `Orden de visita — ${routeName} (${clients.length} clientes)`;
+  document.getElementById('panelHead').innerHTML = `Orden de visita<small>${routeName} · ${clients.length} clientes</small>`;
   listEl.innerHTML = '';
 
   if (clients.length === 0) {
@@ -248,13 +248,14 @@ export async function drawRealRoute(routeName, clients, { force = false } = {}) 
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
     const km = (geo.distance / 1000).toFixed(1);
-    const hrs = Math.floor(geo.duration / 3600);
-    const mins = Math.round((geo.duration % 3600) / 60);
+    const totalMin = Math.round(geo.duration / 60); // (antes: "2h 60min" al redondear los minutos por separado)
+    const hrs = Math.floor(totalMin / 60);
+    const mins = totalMin % 60;
     banner.className = 'status-banner ok';
-    banner.innerHTML = `<span class="dot"></span> Ruta real por calles — ${km} km, ~${hrs}h ${mins}min de manejo.`;
+    banner.innerHTML = `<span class="dot"></span> Ruta por calles · ${km} km · ~${hrs} h ${mins} min`;
   } catch (err) {
     drawStraightFallback(clients);
     banner.className = 'status-banner warn';
-    banner.innerHTML = '<span class="dot" style="background:var(--warn)"></span> No se pudo calcular la ruta por calles ahora, mostrando líneas rectas como referencia.';
+    banner.innerHTML = '<span class="dot" style="background:var(--warn)"></span> Sin ruta por calles por ahora · línea recta de referencia';
   }
 }
