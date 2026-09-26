@@ -198,8 +198,26 @@ function hideSplash() {
 main().catch(err => console.error('Error al iniciar la app', err)).finally(hideSplash);
 
 if ('serviceWorker' in navigator) {
+  // Actualización automática: si ya había un service worker controlando la página
+  // y aparece uno nuevo (controllerchange), se recarga una sola vez para mostrar la
+  // versión nueva sin tener que cerrar y abrir la app varias veces. En la primera
+  // instalación (sin controlador previo) no se recarga.
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloadedForUpdate = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloadedForUpdate) return;
+    reloadedForUpdate = true;
+    location.reload();
+  });
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      // Una PWA instalada suele reanudarse desde segundo plano sin recargar la página:
+      // al volver a primer plano se busca si hay versión nueva.
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) reg.update().catch(() => {});
+      });
+    }).catch(err => {
       console.error('No se pudo registrar el service worker', err);
     });
   });

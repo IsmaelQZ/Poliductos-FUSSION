@@ -3,7 +3,7 @@
 // del mapa (OpenStreetMap) a medida que se piden — ya sea navegando el mapa
 // o por la descarga proactiva de js/offline.js. La geometría de ruta real
 // (OSRM) se cachea aparte, en IndexedDB, ver js/routing.js.
-const SHELL_CACHE = 'rutas-shell-v28';
+const SHELL_CACHE = 'rutas-shell-v29';
 const TILE_CACHE = 'rutas-tiles-v1';
 const MAX_TILE_ENTRIES = 8000; // cubre ambas rutas (z11–15) con margen
 const APP_SHELL = [
@@ -37,7 +37,12 @@ const KNOWN_CACHES = [SHELL_CACHE, TILE_CACHE];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(SHELL_CACHE).then(cache => cache.addAll(APP_SHELL))
+    // cache:'reload' salta el caché HTTP (GitHub Pages sirve max-age=600): sin esto,
+    // una versión nueva del service worker podía precachear copias viejas de los
+    // archivos que se habían bajado minutos antes y quedarse con la app vieja.
+    caches.open(SHELL_CACHE).then(cache =>
+      cache.addAll(APP_SHELL.map(url => new Request(url, { cache: 'reload' })))
+    )
   );
   self.skipWaiting();
 });

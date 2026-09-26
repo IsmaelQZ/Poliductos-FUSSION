@@ -44,7 +44,8 @@ Luego abrir `http://localhost:8099/`.
 
 ## Notas técnicas
 
-- Cada vez que se edite un archivo del app shell (`css/`, `js/`, `data/config.json`, `index.html`, `icons/`), hay que subir `SHELL_CACHE` en `sw.js` (va en `rutas-shell-v28`) para que el service worker no sirva versiones viejas desde caché.
+- Cada vez que se edite un archivo del app shell (`css/`, `js/`, `data/config.json`, `index.html`, `icons/`), hay que subir `SHELL_CACHE` en `sw.js` (va en `rutas-shell-v29`) para que el service worker no sirva versiones viejas desde caché.
+- Actualizaciones de la PWA: GitHub Pages sirve todo con `Cache-Control: max-age=600`. El `install` del SW usa `cache: 'reload'` en `addAll` para no precachear copias viejas del caché HTTP (antes, abrir la app minutos antes de un deploy dejaba el caché de la versión nueva lleno de archivos viejos: el usuario seguía viendo la pantalla de carga anterior). `js/app.js` recarga la página una sola vez en `controllerchange` (si ya había SW previo) y llama `reg.update()` al volver a primer plano, así las versiones nuevas se aplican solas sin cerrar/abrir varias veces. Sigue siendo obligatorio subir `SHELL_CACHE` en cada cambio del app shell.
 - Los encabezados de columnas del Sheet se leen sin distinguir mayúsculas/minúsculas (`field()` en `js/sheet.js`, reusado por `js/pricing.js`).
 - El ícono de pantalla de inicio en iOS **no se auto-actualiza**: si se vuelve a cambiar el logo, hay que decirle al usuario que borre el ícono y lo vuelva a agregar.
 - Identidad de git para commits: no la configuro yo (tengo prohibido tocar `git config`); si hace falta, pedirle al usuario que corra `git config user.email/user.name` él mismo.
