@@ -185,7 +185,10 @@ export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = 
 
   clients.forEach((s, i) => {
     const n = i + 1;
-    L.marker([s.lat, s.lng], { icon: numIcon(n) }).addTo(markersLayer)
+    // keyboard:false — con teclado habilitado, tocar un marcador le da foco y
+    // Leaflet llama a map.panInside() (Marker._panOnFocus); con el mapa girado el
+    // panInside del plugin calcula mal y desplaza el mapa cientos de píxeles.
+    L.marker([s.lat, s.lng], { icon: numIcon(n), keyboard: false }).addTo(markersLayer)
       .bindPopup(`<b>${n}. ${s.nombre}</b><br><a class="popup-nav-link" href="${googleMapsUrl(s.lat, s.lng)}" target="_blank" rel="noopener">Ir →</a>`, {
         // autoPan mueve el mapa para que quepa el popup, pero con leaflet-rotate
         // calcula mal el desplazamiento y el mapa "salta" al tocar un marcador.
