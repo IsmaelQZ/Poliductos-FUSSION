@@ -62,7 +62,12 @@ setTimeout(refreshMapSize, 300);
 // importar en qué orden se hayan dibujado (el trazo se vuelve a dibujar
 // en cada sincronización, lo que antes lo dejaba encima al compartir pane
 // con el punto de ubicación).
-const userLocationPane = map.createPane('userLocationPane');
+//
+// Con el plugin de giro, los panes de mosaicos y trazo viven dentro de
+// "rotatePane" (que gira con el mapa). El pane de ubicación tiene que
+// colgar del mismo contenedor que overlayPane, si no queda fuera del giro
+// y el punto se desubica al manipular el mapa.
+const userLocationPane = map.createPane('userLocationPane', map.getPane('overlayPane').parentNode);
 userLocationPane.style.zIndex = 450;
 
 let userMarker = null;
@@ -214,7 +219,7 @@ export function renderMarkersAndList(routeName, clients, { onLocate, onInfo } = 
 
 function drawStraightFallback(clients) {
   const latlngs = clients.map(c => [c.lat, c.lng]);
-  routeLine = L.polyline(latlngs, { color: '#C23B2A', weight: 3, dashArray: '6,6', opacity: 0.85 }).addTo(map);
+  routeLine = L.polyline(latlngs, { color: '#C23B2A', weight: 3, dashArray: '6,6', opacity: 0.85, noClip: true }).addTo(map);
   map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 }
 
@@ -229,7 +234,10 @@ export async function drawRealRoute(routeName, clients, { force = false } = {}) 
   try {
     const geo = await getRouteGeometry(routeName, clients, { force });
     const coords = geo.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-    routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9 }).addTo(map);
+    // noClip: Leaflet normalmente recorta el trazo a lo visible y solo lo
+    // recalcula al terminar el movimiento; con el mapa girando, las zonas
+    // que van apareciendo quedaban sin trazo hasta soltar los dedos.
+    routeLine = L.polyline(coords, { color: '#F4700D', weight: 4, opacity: 0.9, noClip: true }).addTo(map);
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
 
     const km = (geo.distance / 1000).toFixed(1);
