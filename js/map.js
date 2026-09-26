@@ -1,6 +1,39 @@
 import { getRouteGeometry } from './routing.js';
 
-const map = L.map('map').setView([20.3, -99.35], 10);
+// Giro del mapa como en Google Maps: dos dedos para girar (plugin
+// leaflet-rotate, vendorizado para que funcione offline). Los marcadores
+// se mantienen derechos; el botón de brújula (arriba a la izquierda,
+// aparece solo cuando el mapa está girado) vuelve a poner el norte arriba.
+const map = L.map('map', {
+  rotate: true,
+  touchRotate: true,
+  bearing: 0,
+  rotateControl: false, // el del plugin alterna a "seguir brújula"; usamos uno propio (abajo)
+}).setView([20.3, -99.35], 10);
+
+const COMPASS_ICON = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2.5l4.2 9.5H7.8z" fill="#C23B2A"/>
+  <path d="M12 21.5l-4.2-9.5h8.4z" fill="#9AA3B5"/>
+</svg>`;
+
+// Brújula: solo se ve cuando el mapa está girado; un toque vuelve al norte arriba.
+const compassCtl = L.control({ position: 'topleft' });
+compassCtl.onAdd = () => {
+  const el = L.DomUtil.create('button', 'compass-btn');
+  el.type = 'button';
+  el.title = 'Norte arriba';
+  el.innerHTML = COMPASS_ICON;
+  el.style.display = 'none';
+  L.DomEvent.disableClickPropagation(el);
+  el.addEventListener('click', () => map.setBearing(0));
+  map.on('rotate', () => {
+    const b = map.getBearing();
+    el.style.display = Math.abs(b) < 0.5 ? 'none' : 'flex';
+    el.firstElementChild.style.transform = `rotate(${b}deg)`;
+  });
+  return el;
+};
+compassCtl.addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap',
   maxZoom: 19,

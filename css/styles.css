@@ -98,12 +98,13 @@ select#routeSelect option:disabled{ color:#7A8896; }
 
 .empty-state{ padding:24px 16px; text-align:center; color:var(--muted); font-size:13px; }
 
-.locate-btn, .clients-btn{
+.locate-btn, .clients-btn, .compass-btn{
   width:40px; height:40px; background:#fff; border:2px solid rgba(0,0,0,.2); border-radius:8px;
   font-size:18px; line-height:1; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.3);
   display:flex; align-items:center; justify-content:center;
 }
-.locate-btn:active, .clients-btn:active{ background:#F6F4EF; }
+.locate-btn:active, .clients-btn:active, .compass-btn:active{ background:#F6F4EF; }
+.compass-btn svg{ width:26px; height:26px; transition:transform .1s linear; }
 .locate-btn-pending{ animation:locate-pulse 1s ease-in-out infinite; }
 @keyframes locate-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
 .clients-btn{ color:var(--navy-soft); }
