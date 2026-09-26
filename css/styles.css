@@ -12,13 +12,15 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
    viewport evita ese hueco sin depender de las unidades de viewport. */
 .app{ position:fixed; inset:0; display:flex; flex-direction:column; }
 
-/* Pantalla de carga: logo que sube suavemente, destello de luz que recorre solo
-   el logo (máscara con la propia imagen) y barra de progreso en los colores de la
-   marca. app.js la quita cuando la app ya cargó (mínimo MIN_SPLASH_MS desde que
+/* Pantalla de carga: logo (SVG vectorial) que sube suavemente, destello de luz que
+   recorre solo la forma del logo (recortado con clip-path) y barra de progreso en los
+   colores de la marca. app.js la quita cuando la app ya cargó (mínimo MIN_SPLASH_MS desde que
    abre, la barra dura lo mismo); "splash-safety" la oculta sola a los 6 s por si
    el JS fallara y no llegara a quitarla. */
 #splash{
-  position:fixed; inset:0; z-index:3000;
+  /* bottom negativo + padding: en iPhone instalado, un elemento fixed puede terminar unos px antes
+     del borde inferior (zona del indicador de inicio) y dejaba ver el fondo beige; así la cubre. */
+  position:fixed; top:0; left:0; right:0; bottom:-120px; padding-bottom:120px; z-index:3000;
   background:linear-gradient(180deg, #ffffff 0%, #f1f4fa 100%);
   display:flex; align-items:center; justify-content:center;
   opacity:1; transition:opacity .5s ease;
@@ -32,39 +34,17 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
 #splash.hide .splash-inner{ transform:scale(1.04); }
 
 .splash-logo{
-  position:relative; width:min(46vw, 190px);
+  width:min(52vw, 214px);
   animation:splash-rise .9s cubic-bezier(.22,.7,.25,1) both;
 }
-.splash-logo img{
-  display:block; width:100%; height:auto;
-  filter:drop-shadow(0 14px 14px rgba(12,9,67,.24)) drop-shadow(0 3px 3px rgba(12,9,67,.22));
-}
-/* Sombra de contacto suave debajo del logo: lo "despega" del fondo. */
-.splash-logo::after{
-  content:''; position:absolute; left:16%; right:16%; bottom:-20px; height:12px;
-  background:radial-gradient(ellipse at center, rgba(12,9,67,.20) 0%, rgba(12,9,67,0) 70%);
-  filter:blur(2px); pointer-events:none;
-}
-/* Brillo de volumen: claro arriba, sombreado abajo, solo sobre la forma del logo. */
-.splash-gloss{
-  position:absolute; inset:0; pointer-events:none;
-  -webkit-mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
-          mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
-  background:linear-gradient(180deg,
-    rgba(255,255,255,.34) 0%, rgba(255,255,255,.10) 38%, rgba(255,255,255,0) 52%,
-    rgba(0,0,0,.05) 70%, rgba(0,0,0,.16) 100%);
-}
-.splash-shine{
-  position:absolute; inset:0; pointer-events:none;
-  -webkit-mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
-          mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
-  background:linear-gradient(105deg, transparent 32%, rgba(255,255,255,.72) 50%, transparent 68%);
-  background-size:260% 100%; background-position:160% 0;
-  animation:splash-shine .85s .3s ease-in-out forwards;
-}
+/* El logo es un SVG inline (vectorial: nítido a cualquier densidad de pantalla) que
+   lleva dentro sus degradados, brillo, sombra y destello. Nada de filtros CSS sobre el
+   elemento: en iPhone recortaban la sombra al borde de la imagen. */
+.splash-svg{ display:block; width:100%; height:auto; overflow:visible; }
+.sg-shine{ animation:sg-shine 1s .25s ease-in-out both; }
 
 .splash-bar{
-  width:min(38vw, 150px); height:3px; margin-top:34px; border-radius:3px;
+  width:min(38vw, 150px); height:3px; margin-top:12px; border-radius:3px;
   background:#dde3ee; overflow:hidden;
   animation:splash-fade .6s .35s ease both;
 }
@@ -83,13 +63,13 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
   from{ opacity:0; transform:translateY(14px) scale(.96); }
   to{ opacity:1; transform:none; }
 }
-@keyframes splash-shine{ to{ background-position:-60% 0; } }
+@keyframes sg-shine{ from{ transform:translateX(0); } to{ transform:translateX(1250px); } }
 @keyframes splash-bar{ to{ transform:scaleX(1); } }
 @keyframes splash-fade{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes splash-safety{ to{ opacity:0; visibility:hidden; pointer-events:none; } }
 @media (prefers-reduced-motion: reduce){
   .splash-logo, .splash-bar, .splash-text{ animation:none; }
-  .splash-shine{ display:none; }
+  .sg-shine{ display:none; }
   .splash-bar span{ animation:none; transform:scaleX(1); }
 }
 
