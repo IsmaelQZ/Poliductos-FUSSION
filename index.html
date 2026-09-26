@@ -14,6 +14,25 @@
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="vendor/leaflet-rotate/leaflet-rotate.js"></script>
+<script>
+  // Mide cuánto le falta a un elemento fixed para llegar al borde inferior real de la pantalla
+  // (solo PWA instalada en vertical; ver --fixed-gap en css/styles.css).
+  (function () {
+    try {
+      var standalone = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+      var measure = function () {
+        var gap = 0;
+        if (standalone && innerHeight >= innerWidth) {
+          gap = Math.round(Math.max(screen.width, screen.height) - innerHeight);
+          if (gap < 0 || gap > 80) gap = 0;
+        }
+        document.documentElement.style.setProperty('--fixed-gap', gap + 'px');
+      };
+      measure();
+      addEventListener('resize', measure);
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>

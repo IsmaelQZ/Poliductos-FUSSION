@@ -30,12 +30,15 @@ function fmtSyncTime(ts) {
 
 function openSheet(el) { el.classList.add('open'); }
 function closeSheet(el) {
-  el.classList.remove('open');
+  el.classList.remove('open', 'searching');
   // Si la hoja tiene buscador, que empiece limpio la próxima vez que se abra.
   const search = el.querySelector('.client-search');
-  if (search && search.value) {
-    search.value = '';
-    search.dispatchEvent(new Event('input'));
+  if (search) {
+    search.blur();
+    if (search.value) {
+      search.value = '';
+      search.dispatchEvent(new Event('input'));
+    }
   }
 }
 
@@ -54,7 +57,23 @@ function normalizeSearchText(s) {
 function setupClientSearch() {
   const input = document.getElementById('clientSearch');
   const list = document.getElementById('stopsList');
+  const sheet = document.getElementById('clientsSheet');
+
+  // Al buscar, el teclado del celular tapa la parte de abajo de la pantalla y la hoja
+  // (anclada abajo) quedaba escondida detrás. Mientras se escribe, la hoja se pega ARRIBA
+  // del área visible (visualViewport = pantalla menos teclado) y los resultados quedan arriba.
+  const vv = window.visualViewport;
+  const syncViewport = () => {
+    if (!vv) return;
+    sheet.style.setProperty('--vv-top', vv.offsetTop + 'px');
+    sheet.style.setProperty('--vv-h', vv.height + 'px');
+  };
+  if (vv) { vv.addEventListener('resize', syncViewport); vv.addEventListener('scroll', syncViewport); }
+  input.addEventListener('focus', () => { syncViewport(); sheet.classList.add('searching'); });
+  input.addEventListener('blur', () => { if (!input.value.trim()) sheet.classList.remove('searching'); });
+
   input.addEventListener('input', () => {
+    list.scrollTop = 0; // los que coinciden se ven desde arriba
     const q = normalizeSearchText(input.value.trim());
     const rows = list.querySelectorAll('.stop');
     let anyVisible = false;

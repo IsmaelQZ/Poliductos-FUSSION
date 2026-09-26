@@ -10,7 +10,10 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
    viewport-fit=cover, dvh a veces no cubre el viewport visual completo y
    deja una tira del fondo de body visible abajo. Fijar a los bordes del
    viewport evita ese hueco sin depender de las unidades de viewport. */
-.app{ position:fixed; inset:0; display:flex; flex-direction:column; }
+/* --fixed-gap: en la PWA instalada en iPhone un elemento fixed puede terminar unos px antes
+   del borde inferior real (zona del indicador de inicio) y dejaba ver el fondo beige; un
+   script en index.html mide esa diferencia (solo instalada y vertical) y aquí se compensa. */
+.app{ position:fixed; top:0; left:0; right:0; bottom:calc(-1 * var(--fixed-gap, 0px)); display:flex; flex-direction:column; }
 
 /* Pantalla de carga: logo (SVG vectorial) que sube suavemente, destello de luz que
    recorre solo la forma del logo (recortado con clip-path) y barra de progreso en los
@@ -101,7 +104,7 @@ select#routeSelect option:disabled{ color:#7A8896; }
 
 /* Hojas deslizables (clientes, info) — el mapa queda a pantalla completa
    y estas se abren encima como una bandeja inferior. */
-.sheet{ position:fixed; inset:0; z-index:1000; visibility:hidden; }
+.sheet{ position:fixed; top:0; left:0; right:0; bottom:calc(-1 * var(--fixed-gap, 0px)); z-index:1000; visibility:hidden; }
 .sheet.open{ visibility:visible; }
 .sheet-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.4); opacity:0; transition:opacity .2s; }
 .sheet.open .sheet-backdrop{ opacity:1; }
@@ -111,6 +114,15 @@ select#routeSelect option:disabled{ color:#7A8896; }
   display:flex; flex-direction:column; transform:translateY(100%); transition:transform .25s ease;
 }
 .sheet.open .sheet-panel{ transform:translateY(0); }
+
+/* Modo búsqueda (teclado abierto): la hoja ocupa el área visible y el panel se pega arriba. */
+.sheet.searching{ top:var(--vv-top, 0px); bottom:auto; height:var(--vv-h, 100%); }
+.sheet.searching .sheet-panel{
+  top:0; bottom:auto; max-height:100%; transition:none;
+  border-radius:0 0 16px 16px; padding-top:env(safe-area-inset-top);
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.sheet.searching .sheet-handle{ display:none; }
 .sheet-handle{ width:36px; height:4px; background:var(--line); border-radius:2px; margin:10px auto 2px; flex-shrink:0; }
 .sheet-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 12px 6px 16px; position:sticky; top:0; background:#fff; flex-shrink:0; }
 .sheet-title{ font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
@@ -121,7 +133,7 @@ select#routeSelect option:disabled{ color:#7A8896; }
 .search-row{ padding:2px 16px 8px; flex-shrink:0; }
 .client-search{
   width:100%; background:var(--paper); border:1px solid var(--line); border-radius:8px;
-  padding:9px 12px; font-size:13.5px; color:var(--ink);
+  padding:9px 12px; font-size:16px; color:var(--ink);
 }
 .client-search::placeholder{ color:var(--muted); }
 
