@@ -12,28 +12,67 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
    viewport evita ese hueco sin depender de las unidades de viewport. */
 .app{ position:fixed; inset:0; display:flex; flex-direction:column; }
 
-/* Pantalla de carga: el logo aparece desde difuminado. app.js la quita cuando
-   la app ya cargó (mínimo ~1.8 s desde que abre); la animación "splash-safety"
-   la oculta sola a los 6 s por si el JS fallara y no llegara a quitarla. */
+/* Pantalla de carga: logo que sube suavemente, destello de luz que recorre solo
+   el logo (máscara con la propia imagen) y barra de progreso en los colores de la
+   marca. app.js la quita cuando la app ya cargó (mínimo MIN_SPLASH_MS desde que
+   abre, la barra dura lo mismo); "splash-safety" la oculta sola a los 6 s por si
+   el JS fallara y no llegara a quitarla. */
 #splash{
-  position:fixed; inset:0; z-index:3000; background:#fff;
+  position:fixed; inset:0; z-index:3000;
+  background:linear-gradient(180deg, #ffffff 0%, #f1f4fa 100%);
   display:flex; align-items:center; justify-content:center;
-  opacity:1; transition:opacity .45s ease;
+  opacity:1; transition:opacity .5s ease;
   animation:splash-safety 0s 6s forwards;
 }
 #splash.hide{ opacity:0; pointer-events:none; }
-#splash img{
-  width:min(52vw, 230px); height:auto;
-  animation:splash-reveal 1.2s cubic-bezier(.22,.7,.25,1) both;
+.splash-inner{
+  display:flex; flex-direction:column; align-items:center;
+  transition:transform .5s ease;
 }
-@keyframes splash-reveal{
-  0%{ opacity:0; filter:blur(22px); transform:scale(.92); }
-  60%{ opacity:1; }
-  100%{ opacity:1; filter:blur(0); transform:scale(1); }
+#splash.hide .splash-inner{ transform:scale(1.04); }
+
+.splash-logo{
+  position:relative; width:min(46vw, 190px);
+  animation:splash-rise .9s cubic-bezier(.22,.7,.25,1) both;
 }
+.splash-logo img{ display:block; width:100%; height:auto; }
+.splash-shine{
+  position:absolute; inset:0; pointer-events:none;
+  -webkit-mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
+          mask:url('../icons/logo-splash.png') center/100% 100% no-repeat;
+  background:linear-gradient(105deg, transparent 34%, rgba(255,255,255,.62) 50%, transparent 66%);
+  background-size:260% 100%; background-position:160% 0;
+  animation:splash-shine 1.1s .7s ease-in-out forwards;
+}
+
+.splash-bar{
+  width:min(38vw, 150px); height:3px; margin-top:34px; border-radius:3px;
+  background:#dde3ee; overflow:hidden;
+  animation:splash-fade .6s .35s ease both;
+}
+.splash-bar span{
+  display:block; width:100%; height:100%; border-radius:3px;
+  background:linear-gradient(90deg, var(--navy-soft), var(--amber));
+  transform-origin:left center; transform:scaleX(0);
+  animation:splash-bar 1.9s .3s cubic-bezier(.4,.1,.3,1) forwards;
+}
+.splash-text{
+  margin-top:14px; font-size:10.5px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--muted); animation:splash-fade .6s .45s ease both;
+}
+
+@keyframes splash-rise{
+  from{ opacity:0; transform:translateY(14px) scale(.96); }
+  to{ opacity:1; transform:none; }
+}
+@keyframes splash-shine{ to{ background-position:-60% 0; } }
+@keyframes splash-bar{ to{ transform:scaleX(1); } }
+@keyframes splash-fade{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes splash-safety{ to{ opacity:0; visibility:hidden; pointer-events:none; } }
 @media (prefers-reduced-motion: reduce){
-  #splash img{ animation:none; }
+  .splash-logo, .splash-bar, .splash-text{ animation:none; }
+  .splash-shine{ display:none; }
+  .splash-bar span{ animation:none; transform:scaleX(1); }
 }
 
 .topbar{

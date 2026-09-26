@@ -3,7 +3,7 @@
 // del mapa (OpenStreetMap) a medida que se piden — ya sea navegando el mapa
 // o por la descarga proactiva de js/offline.js. La geometría de ruta real
 // (OSRM) se cachea aparte, en IndexedDB, ver js/routing.js.
-const SHELL_CACHE = 'rutas-shell-v26';
+const SHELL_CACHE = 'rutas-shell-v28';
 const TILE_CACHE = 'rutas-tiles-v1';
 const MAX_TILE_ENTRIES = 8000; // cubre ambas rutas (z11–15) con margen
 const APP_SHELL = [
@@ -28,6 +28,7 @@ const APP_SHELL = [
   'vendor/leaflet/images/layers-2x.png',
   'vendor/leaflet/images/marker-icon.png',
   'vendor/leaflet-rotate/leaflet-rotate.js',
+  'icons/logo-splash.png',
   'icons/icon-192.png',
   'icons/icon-512.png',
 ];

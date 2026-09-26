@@ -184,7 +184,7 @@ async function main() {
 
 // Quita la pantalla de carga con el logo, pero no antes de MIN_SPLASH_MS desde
 // que abrió la página, para que la animación de aparición alcance a verse.
-const MIN_SPLASH_MS = 1800;
+const MIN_SPLASH_MS = 2200;
 function hideSplash() {
   const el = document.getElementById('splash');
   if (!el) return;
