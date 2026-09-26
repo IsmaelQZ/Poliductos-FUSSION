@@ -12,6 +12,30 @@ body{ font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(
    viewport evita ese hueco sin depender de las unidades de viewport. */
 .app{ position:fixed; inset:0; display:flex; flex-direction:column; }
 
+/* Pantalla de carga: el logo aparece desde difuminado. app.js la quita cuando
+   la app ya cargó (mínimo ~1.8 s desde que abre); la animación "splash-safety"
+   la oculta sola a los 6 s por si el JS fallara y no llegara a quitarla. */
+#splash{
+  position:fixed; inset:0; z-index:3000; background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  opacity:1; transition:opacity .45s ease;
+  animation:splash-safety 0s 6s forwards;
+}
+#splash.hide{ opacity:0; pointer-events:none; }
+#splash img{
+  width:min(52vw, 230px); height:auto;
+  animation:splash-reveal 1.2s cubic-bezier(.22,.7,.25,1) both;
+}
+@keyframes splash-reveal{
+  0%{ opacity:0; filter:blur(22px); transform:scale(.92); }
+  60%{ opacity:1; }
+  100%{ opacity:1; filter:blur(0); transform:scale(1); }
+}
+@keyframes splash-safety{ to{ opacity:0; visibility:hidden; pointer-events:none; } }
+@media (prefers-reduced-motion: reduce){
+  #splash img{ animation:none; }
+}
+
 .topbar{
   background:var(--navy); color:#fff; flex-shrink:0;
   padding:calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 10px calc(16px + env(safe-area-inset-left));

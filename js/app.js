@@ -182,7 +182,20 @@ async function main() {
   addClientsButton(() => openSheet(clientsSheet));
 }
 
-main();
+// Quita la pantalla de carga con el logo, pero no antes de MIN_SPLASH_MS desde
+// que abrió la página, para que la animación de aparición alcance a verse.
+const MIN_SPLASH_MS = 1800;
+function hideSplash() {
+  const el = document.getElementById('splash');
+  if (!el) return;
+  const wait = Math.max(0, MIN_SPLASH_MS - performance.now());
+  setTimeout(() => {
+    el.classList.add('hide');
+    setTimeout(() => el.remove(), 600);
+  }, wait);
+}
+
+main().catch(err => console.error('Error al iniciar la app', err)).finally(hideSplash);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
